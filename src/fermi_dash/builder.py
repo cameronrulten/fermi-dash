@@ -80,9 +80,12 @@ def find_sed_path(target_dir: Path, allow_pdf: bool) -> Optional[Path]:
 
 LC_RE = re.compile(r"^(?P<name>.+?)_lightcurve_data_(?P<days>[0-9]+(?:\.[0-9]+)?)days\.(?P<ext>[a-zA-Z0-9]+)$")
 
-def discover_lightcurves(lc_dir: Path, name: str) -> Dict[float, Path]:
-    """Return mapping {days: path} discovered under lc_dir for a given name."""
-    out: Dict[float, Path] = {}
+def discover_lightcurves(lc_dir: Path) -> dict[float, dict[str, Path]]:
+    """
+    Return {days: {ext: path, ...}} discovered under lc_dir.
+    Ignores non-visual files like .txt.
+    """
+    out: dict[float, dict[str, Path]] = {}
     if not lc_dir.exists():
         return out
     for p in lc_dir.iterdir():
@@ -91,14 +94,14 @@ def discover_lightcurves(lc_dir: Path, name: str) -> Dict[float, Path]:
         m = LC_RE.match(p.name)
         if not m:
             continue
-        # no longer enforce, just trust the user to provide correct names
-        # if m.group("name") != name:
-        #     continue
+        ext = p.suffix.lower()
+        if ext not in IMG_EXTS | HTML_EXTS:   # 🔧 ignore .txt, .csv, etc.
+            continue
         try:
             days = float(m.group("days"))
         except ValueError:
             continue
-        out[days] = p
+        out.setdefault(days, {})[ext] = p
     return out
 
 # ------------------ Panel UI builders ------------------
@@ -126,11 +129,10 @@ def _lc_pane(path: Path, prefer_html: bool) -> pn.viewable.Viewable:
         except Exception:
             pass
     # Fallback to image if available or if HTML disabled
-    if ext in IMG_EXTS:
-        # Use the PNG pane + embed to inline base64
-        return pn.pane.Image(
-            str(path), height=360, sizing_mode="stretch_width", embed=True, margin=0
-        )
+    if ext == ".png":
+        return pn.pane.PNG(str(path), height=360, sizing_mode="stretch_width", embed=True, margin=0)
+    if ext in {".jpg", ".jpeg", ".gif", ".svg"}:
+        return pn.pane.Image(str(path), height=360, sizing_mode="stretch_width", embed=True, margin=0)
     if ext in HTML_EXTS:
         # HTML present but prefer_html=False → link out
         return pn.pane.Markdown(f"[Open lightcurve HTML]({path.as_posix()})")
@@ -159,17 +161,41 @@ def build_dashboard(opts: BuildOptions) -> Path:
         )
 
         lc_dir = tdir / "lc_plots"
-        discovered = discover_lightcurves(lc_dir, name)
-        if opts.days:
-            # filter to requested bins if present
-            pairs = [(d, discovered.get(d)) for d in opts.days]
-            pairs = [(d, p) for d, p in pairs if p is not None]
-        else:
-            pairs = sorted(discovered.items(), key=lambda kv: kv[0])
+        
+        found_map = discover_lightcurves(lc_dir)
 
-        debug_paths = [p for _, p in pairs][:2]
-        for i, p in enumerate(debug_paths, 1):
-            console.print(f"[dim]  LC path {i}: {p}[/dim]")
+        # what bins to include
+        wanted_days = opts.days if opts.days else sorted(found_map.keys())
+
+        # choose best file per day
+        pairs: list[tuple[float, Path]] = []
+        for d in wanted_days:
+            files = found_map.get(d, {})
+            chosen: Path | None = None
+            if opts.prefer_html and ".html" in files:
+                chosen = files[".html"]
+            else:
+                for e in [".png", ".jpg", ".jpeg", ".gif", ".svg", ".html"]:
+                    if e in files:
+                        chosen = files[e]
+                        break
+            if chosen:
+                pairs.append((d, chosen))
+
+        console.print(f"[dim]{name}: chosen LC files → "
+              + ", ".join(f"{d:g}={p.suffix.lower()[1:]}" for d, p in pairs) if pairs else "[none]")
+
+        # discovered = discover_lightcurves(lc_dir, name)
+        # if opts.days:
+        #     # filter to requested bins if present
+        #     pairs = [(d, discovered.get(d)) for d in opts.days]
+        #     pairs = [(d, p) for d, p in pairs if p is not None]
+        # else:
+        #     pairs = sorted(discovered.items(), key=lambda kv: kv[0])
+
+        # debug_paths = [p for _, p in pairs][:2]
+        # for i, p in enumerate(debug_paths, 1):
+        #     console.print(f"[dim]  LC path {i}: {p}[/dim]")
 
         lc_cards: List[pn.Card] = []
         for d, p in pairs:
@@ -210,6 +236,15 @@ def build_dashboard(opts: BuildOptions) -> Path:
         theme="dark",
         theme_toggle=False,
     )
+
+    # 🔧 force dark colors as a safety net
+    template.config.raw_css = ["""
+    body, .bk, .bk-root { background: #0b0d10 !important; color: #e7e9ea !important; }
+    .pnx-header, .pnx-content { background: #0b0d10 !important; }
+    .bk-panel-models-card, .bk-card { background: #0f1216 !important; border-color: #1f2328 !important; }
+    .bk-tabs-header { background: #0b0d10 !important; border-color: #1f2328 !important; }
+    .bk-tabs-header .bk-active { color: #e7e9ea !important; }
+    """]
 
     # One-file export suitable for sharing
     #template.save(str(opts.outfile), embed=True)
