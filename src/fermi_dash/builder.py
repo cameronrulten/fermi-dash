@@ -6,8 +6,10 @@ from typing import Iterable, List, Optional, Dict, Any
 import yaml
 from rich import print as rprint
 from rich.console import Console
+from rich.table import Table
 import panel as pn
 from panel.io.save import save as pn_save
+from panel.theme import DarkTheme
 
 pn.extension("plotly") # harmless if unused; keeps template resources present
 
@@ -89,8 +91,9 @@ def discover_lightcurves(lc_dir: Path, name: str) -> Dict[float, Path]:
         m = LC_RE.match(p.name)
         if not m:
             continue
-        if m.group("name") != name:
-            continue
+        # no longer enforce, just trust the user to provide correct names
+        # if m.group("name") != name:
+        #     continue
         try:
             days = float(m.group("days"))
         except ValueError:
@@ -130,6 +133,7 @@ def _lc_pane(path: Path, prefer_html: bool) -> pn.viewable.Viewable:
     return pn.pane.Markdown("*Lightcurve not available*")
 
 def build_dashboard(opts: BuildOptions) -> Path:
+    summaries = []
     names = load_target_names(opts.config_yaml)
     if not names:
         console.print("[bold red]No target names found in YAML.[/bold red]")
@@ -171,6 +175,11 @@ def build_dashboard(opts: BuildOptions) -> Path:
         content = pn.Column(sed_card, lc_section, sizing_mode="stretch_both")
         tabs.append((name, content))
 
+        #per target summary
+        sed_ok = sed_path is not None
+        found_bins = sorted(d for d, _ in pairs) if pairs else []
+        summaries.append((name, sed_ok, len(found_bins), found_bins))
+
     if not tabs:
         console.print("[bold red]No tabs to render (no targets found).[/bold red]")
         raise SystemExit(3)
@@ -182,16 +191,29 @@ def build_dashboard(opts: BuildOptions) -> Path:
         sizing_mode="stretch_width",
     )
 
-    tabs_obj = pn.Tabs(*tabs, dynamic=True)
+    tabs_obj = pn.Tabs(*tabs, dynamic=False)
 
     template = pn.template.FastListTemplate(
         title=opts.title,
         main=[header, tabs_obj],
-        theme="dark",
+        theme=DarkTheme,
     )
 
     # One-file export suitable for sharing
     #template.save(str(opts.outfile), embed=True)
     pn_save(template, str(opts.outfile), resources="inline")
+
+    #print summary table
+    table = Table(title="Dashboard build summary")
+    table.add_column("Target")
+    table.add_column("SED", justify="center")
+    table.add_column("#LC bins", justify="right")
+    table.add_column("Bins")
+    for t, sed_ok, n, bins in summaries:
+        table.add_row(t, "✅" if sed_ok else "❌",
+                    str(n),
+                    ", ".join(f"{b:g}" for b in bins) if bins else "—")
+    console.print(table)
+
     console.print(f"[green]Saved[/green] {opts.outfile}")
     return opts.outfile
