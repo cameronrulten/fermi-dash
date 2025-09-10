@@ -112,11 +112,14 @@ def _sed_pane(path: Path) -> pn.viewable.Viewable:
     if ext in PDF_EXTS:
         # Lightweight fallback to show a link rather than embedding heavy PDFJS
         return pn.pane.Markdown(f"[Open SED PDF]({path.as_posix()})")
+    
     return pn.pane.Markdown("*SED not available*")
 
 def _lc_pane(path: Path, prefer_html: bool) -> pn.viewable.Viewable:
     ext = path.suffix.lower()
     if prefer_html and ext in HTML_EXTS:
+        # Raw HTML from Bokeh may include <script> tags; pn.pane.HTML will include them,
+        # but some browsers are picky with file://. PNGs are safer for single-file dashboards.
         try:
             html = path.read_text(encoding="utf-8")
             return pn.pane.HTML(html, height=420, sizing_mode="stretch_width", margin=0)
@@ -124,12 +127,14 @@ def _lc_pane(path: Path, prefer_html: bool) -> pn.viewable.Viewable:
             pass
     # Fallback to image if available or if HTML disabled
     if ext in IMG_EXTS:
+        # Use the PNG pane + embed to inline base64
         return pn.pane.Image(
             str(path), height=360, sizing_mode="stretch_width", embed=True, margin=0
         )
     if ext in HTML_EXTS:
         # HTML present but prefer_html=False → link out
         return pn.pane.Markdown(f"[Open lightcurve HTML]({path.as_posix()})")
+    
     return pn.pane.Markdown("*Lightcurve not available*")
 
 def build_dashboard(opts: BuildOptions) -> Path:
@@ -150,6 +155,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
         sed_card = pn.Card(
             _sed_pane(sed_path) if sed_path else pn.pane.Markdown("*No SED found*"),
             title=f"SED — {name}",
+            collapsible=False,
         )
 
         lc_dir = tdir / "lc_plots"
@@ -161,14 +167,19 @@ def build_dashboard(opts: BuildOptions) -> Path:
         else:
             pairs = sorted(discovered.items(), key=lambda kv: kv[0])
 
+        debug_paths = [p for _, p in pairs][:2]
+        for i, p in enumerate(debug_paths, 1):
+            console.print(f"[dim]  LC path {i}: {p}[/dim]")
+
         lc_cards: List[pn.Card] = []
         for d, p in pairs:
             pane = _lc_pane(p, opts.prefer_html)
-            lc_cards.append(pn.Card(pane, title=f"Lightcurve — {d:g} days"))
+            lc_cards.append(pn.Card(pane, title=f"Lightcurve — {d:g} days", collapsible=False))
 
         lc_section: pn.viewable.Viewable
         if lc_cards:
-            lc_section = pn.GridBox(*lc_cards, ncols=2, sizing_mode="stretch_both")
+            lc_section = pn.Column(*lc_cards, sizing_mode="stretch_width")
+            # lc_section = pn.GridBox(*lc_cards, ncols=2, sizing_mode="stretch_both")
         else:
             lc_section = pn.pane.Markdown("*No matching lightcurves found*")
 
