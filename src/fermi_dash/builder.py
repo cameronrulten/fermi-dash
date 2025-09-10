@@ -17,6 +17,9 @@ IMG_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".svg"}
 HTML_EXTS = {".html"}
 PDF_EXTS = {".pdf"}
 
+# capture “…_lightcurve_data_<days>days.<ext>” anywhere in the name
+LC_DAYS_RE = re.compile(r"_lightcurve_data_([0-9]+(?:\.[0-9]+)?)days(?=\.)")
+
 console = Console()
 
 @dataclass
@@ -80,27 +83,24 @@ def find_sed_path(target_dir: Path, allow_pdf: bool) -> Optional[Path]:
 
 LC_RE = re.compile(r"^(?P<name>.+?)_lightcurve_data_(?P<days>[0-9]+(?:\.[0-9]+)?)days\.(?P<ext>[a-zA-Z0-9]+)$")
 
-def discover_lightcurves(lc_dir: Path) -> dict[float, dict[str, Path]]:
+def discover_lightcurves(lc_dir: Path) -> Dict[float, Dict[str, Path]]:
     """
-    Return {days: {ext: path, ...}} discovered under lc_dir.
-    Ignores non-visual files like .txt.
+    Returns {days: {'.png': Path, '.html': Path, ...}}.
+    Skips non-visual files like .txt/.csv.
     """
-    out: dict[float, dict[str, Path]] = {}
+    out: Dict[float, Dict[str, Path]] = {}
     if not lc_dir.exists():
         return out
     for p in lc_dir.iterdir():
         if not p.is_file():
             continue
-        m = LC_RE.match(p.name)
+        m = LC_DAYS_RE.search(p.name)
         if not m:
             continue
         ext = p.suffix.lower()
-        if ext not in IMG_EXTS | HTML_EXTS:   # 🔧 ignore .txt, .csv, etc.
+        if ext not in (IMG_EXTS | HTML_EXTS):
             continue
-        try:
-            days = float(m.group("days"))
-        except ValueError:
-            continue
+        days = float(m.group(1))
         out.setdefault(days, {})[ext] = p
     return out
 
@@ -161,11 +161,11 @@ def build_dashboard(opts: BuildOptions) -> Path:
         )
 
         lc_dir = tdir / "lc_plots"
-        
         found_map = discover_lightcurves(lc_dir)
 
+        # which bins to include
         if opts.days:
-            wanted_days = list(dict.fromkeys(opts.days))  # dedupe, keep order
+            wanted_days = list(dict.fromkeys(opts.days))  # dedupe, preserve order
         else:
             wanted_days = sorted(found_map.keys())
 
@@ -184,26 +184,22 @@ def build_dashboard(opts: BuildOptions) -> Path:
             if chosen:
                 pairs.append((d, chosen))
 
+        # debug
         if pairs:
-            console.print(
-                f"[dim]{name}: chosen LC files → "
-                + ", ".join(f"{d:g}={p.suffix.lower()[1:]}" for d, p in pairs)
-            )
+            console.print(f"[dim]{name}: chosen LC files → " +
+                        ", ".join(f"{d:g}={p.suffix.lower()[1:]}" for d, p in pairs))
         else:
             console.print(f"[dim]{name}: chosen LC files → [none]")
 
-        # discovered = discover_lightcurves(lc_dir, name)
-        # if opts.days:
-        #     # filter to requested bins if present
-        #     pairs = [(d, discovered.get(d)) for d in opts.days]
-        #     pairs = [(d, p) for d, p in pairs if p is not None]
-        # else:
-        #     pairs = sorted(discovered.items(), key=lambda kv: kv[0])
+        # build cards
+        #shorter comprehension version
+        # lc_cards: List[pn.Card] = [
+        #     pn.Card(_lc_pane(p, opts.prefer_html), title=f"Lightcurve — {d:g} days", collapsible=False)
+        #     for d, p in pairs
+        # ]
+        # lc_section = pn.Column(*lc_cards, sizing_mode="stretch_width") if lc_cards else pn.pane.Markdown("*No matching lightcurves found*")
 
-        # debug_paths = [p for _, p in pairs][:2]
-        # for i, p in enumerate(debug_paths, 1):
-        #     console.print(f"[dim]  LC path {i}: {p}[/dim]")
-
+        # expanded version of lc_cards comprehension
         lc_cards: List[pn.Card] = []
         for d, p in pairs:
             pane = _lc_pane(p, opts.prefer_html)
