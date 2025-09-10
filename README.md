@@ -13,10 +13,11 @@ uv run fermi-dash --root /path/to/analysis --config analysis.yaml --outfile dash
 ```
 
 ### Options
-```--days 7 30 365``` — filter which lightcurve bins to include.
---prefer-html — embed Bokeh HTML lightcurves when present; otherwise uses PNG.
---allow-pdf — if sed_plot.png missing, link to PDF.
-Folder expectations
+- ```--days 7 30 365``` — filter which lightcurve bins to include.
+- ```--prefer-html``` — embed Bokeh HTML lightcurves when present; otherwise uses PNG.
+- ```--allow-pdf``` — if sed_plot.png missing, link to PDF.
+
+### Folder expectations
 analysis.yaml contains objects with name keys (any nesting), e.g.:
 
 ```
