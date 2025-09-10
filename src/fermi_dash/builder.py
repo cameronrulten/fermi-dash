@@ -13,7 +13,7 @@ from panel.theme import DarkTheme
 
 pn.extension("plotly") # harmless if unused; keeps template resources present
 
-IMG_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".svg"}
+IMG_EXTS = {".png"} #, ".jpg", ".jpeg", ".gif", ".svg"}
 HTML_EXTS = {".html"}
 PDF_EXTS = {".pdf"}
 
