@@ -164,8 +164,10 @@ def build_dashboard(opts: BuildOptions) -> Path:
         
         found_map = discover_lightcurves(lc_dir)
 
-        # what bins to include
-        wanted_days = opts.days if opts.days else sorted(found_map.keys())
+        if opts.days:
+            wanted_days = list(dict.fromkeys(opts.days))  # dedupe, keep order
+        else:
+            wanted_days = sorted(found_map.keys())
 
         # choose best file per day
         pairs: list[tuple[float, Path]] = []
@@ -182,8 +184,13 @@ def build_dashboard(opts: BuildOptions) -> Path:
             if chosen:
                 pairs.append((d, chosen))
 
-        console.print(f"[dim]{name}: chosen LC files → "
-              + ", ".join(f"{d:g}={p.suffix.lower()[1:]}" for d, p in pairs) if pairs else "[none]")
+        if pairs:
+            console.print(
+                f"[dim]{name}: chosen LC files → "
+                + ", ".join(f"{d:g}={p.suffix.lower()[1:]}" for d, p in pairs)
+            )
+        else:
+            console.print(f"[dim]{name}: chosen LC files → [none]")
 
         # discovered = discover_lightcurves(lc_dir, name)
         # if opts.days:
