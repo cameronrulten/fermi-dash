@@ -10,7 +10,8 @@ app = typer.Typer(add_completion=False, help="Build a static HTML dashboard of S
 @app.command()
 def main(
 root: Path = typer.Option(..., exists=True, file_okay=False, dir_okay=True, readable=True, help="Analysis root directory"),
-config: Path = typer.Option(..., exists=True, file_okay=True, dir_okay=False, readable=True, help="YAML listing targets with 'name' keys"),
+config: Path = typer.Option(..., help="YAML listing targets with 'name' keys. If not absolute, it's resolved under --root."),
+# config: Path = typer.Option(..., exists=True, file_okay=True, dir_okay=False, readable=True, help="YAML listing targets with 'name' keys"),
 outfile: Path = typer.Option(Path("fermi_dashboard.html"), help="Output HTML file path"),
 title: str = typer.Option("Fermi-LAT Dashboard", help="Dashboard title"),
 subtitle: str = typer.Option("Auto-generated", help="Subtitle"),
@@ -35,12 +36,14 @@ allow_pdf: bool = typer.Option(False, help="Attempt to link/embed PDF SEDs if PN
     # allow_pdf=allow_pdf,
     # )
 
-    # Normalize config relative to root if needed
-    cfg = config
+     # ---- Resolve config path with Pathlib ----
+    cfg = Path(config)
     if not cfg.is_absolute():
-        maybe = root / cfg
-        if maybe.exists():
-            cfg = maybe
+        cfg = (root / cfg).resolve()
+
+    if not cfg.exists():
+        # Use Typer's nice error message style
+        raise typer.BadParameter(f"Config file not found after resolving: {cfg}")
 
     # Parse days into a sorted list of floats (dedup)
     parsed_days: Optional[List[float]] = None
