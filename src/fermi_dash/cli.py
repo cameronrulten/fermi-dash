@@ -18,22 +18,22 @@ days: Optional[List[float]] = typer.Option(None, help="Lightcurve bin sizes to i
 prefer_html: bool = typer.Option(False, help="Prefer embedding HTML lightcurves if available (Bokeh)"),
 allow_pdf: bool = typer.Option(False, help="Attempt to link/embed PDF SEDs if PNG not found"),
 ):
-"""Create a single-file HTML dashboard from a typical Fermi-LAT analysis folder.
+    """Create a single-file HTML dashboard from a typical Fermi-LAT analysis folder.
 
-Example:
-fermi-dash --root ./analysis --config analysis.yaml --days 7 30 --outfile dash.html
-"""
-opts = BuildOptions(
-root=root,
-config_yaml=config,
-title=title,
-subtitle=subtitle,
-outfile=outfile,
-days=days,
-prefer_html=prefer_html,
-allow_pdf=allow_pdf,
-)
-build_dashboard(opts)
+    Example:
+    fermi-dash --root ./analysis --config analysis.yaml --days 7 30 --outfile dash.html
+    """
+    opts = BuildOptions(
+    root=root,
+    config_yaml=config,
+    title=title,
+    subtitle=subtitle,
+    outfile=outfile,
+    days=days,
+    prefer_html=prefer_html,
+    allow_pdf=allow_pdf,
+    )
+    build_dashboard(opts)
 
 if __name__ == "__main__":
-app()
+    app()
