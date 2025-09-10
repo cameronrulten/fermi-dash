@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import typer
 from rich import print as rprint
 from .builder import BuildOptions, build_dashboard
@@ -14,7 +14,10 @@ config: Path = typer.Option(..., exists=True, file_okay=True, dir_okay=False, re
 outfile: Path = typer.Option(Path("fermi_dashboard.html"), help="Output HTML file path"),
 title: str = typer.Option("Fermi-LAT Dashboard", help="Dashboard title"),
 subtitle: str = typer.Option("Auto-generated", help="Subtitle"),
-days: Optional[List[float]] = typer.Option(None, help="Lightcurve bin sizes to include, e.g. --days 7 30 365"),
+days: Optional[Tuple[str,...]] = typer.Option(None,
+                                              help="Lightcurve bin sizes to include. Accepts multiple values: --days 7 30 365 or comma-separated: --days 7,30,365",
+                                              nargs=-1),
+# days: Optional[List[float]] = typer.Option(None, help="Lightcurve bin sizes to include, e.g. --days 7 30 365"),
 prefer_html: bool = typer.Option(False, help="Prefer embedding HTML lightcurves if available (Bokeh)"),
 allow_pdf: bool = typer.Option(False, help="Attempt to link/embed PDF SEDs if PNG not found"),
 ):
@@ -23,16 +26,50 @@ allow_pdf: bool = typer.Option(False, help="Attempt to link/embed PDF SEDs if PN
     Example:
     fermi-dash --root ./analysis --config analysis.yaml --days 7 30 --outfile dash.html
     """
+    # opts = BuildOptions(
+    # root=root,
+    # config_yaml=config,
+    # title=title,
+    # subtitle=subtitle,
+    # outfile=outfile,
+    # days=days,
+    # prefer_html=prefer_html,
+    # allow_pdf=allow_pdf,
+    # )
+
+    # Normalize config relative to root if needed
+    cfg = config
+    if not cfg.is_absolute():
+        maybe = root / cfg
+        if maybe.exists():
+            cfg = maybe
+
+    # Parse days into a sorted list of floats (dedup)
+    parsed_days = None
+    if days:
+        vals = []
+        for chunk in days:
+            for piece in str(chunk).replace(",", " ").split():
+                vals.append(float(piece))
+        # dedupe preserve order
+        seen = set()
+        parsed_days = []
+        for d in vals:
+            if d not in seen:
+                seen.add(d)
+                parsed_days.append(d)
+
     opts = BuildOptions(
-    root=root,
-    config_yaml=config,
-    title=title,
-    subtitle=subtitle,
-    outfile=outfile,
-    days=days,
-    prefer_html=prefer_html,
-    allow_pdf=allow_pdf,
+        root=root,
+        config_yaml=cfg,
+        title=title,
+        subtitle=subtitle,
+        outfile=outfile,
+        days=parsed_days,
+        prefer_html=prefer_html,
+        allow_pdf=allow_pdf,
     )
+
     build_dashboard(opts)
 
 if __name__ == "__main__":
