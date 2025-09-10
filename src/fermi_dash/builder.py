@@ -7,6 +7,7 @@ import yaml
 from rich import print as rprint
 from rich.console import Console
 import panel as pn
+from panel.io import save as pn_save
 
 pn.extension("plotly") # harmless if unused; keeps template resources present
 
@@ -190,6 +191,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
     )
 
     # One-file export suitable for sharing
-    template.save(str(opts.outfile), embed=True)
+    #template.save(str(opts.outfile), embed=True)
+    pn_save(template, str(opts.outfile), resources="inline")
     console.print(f"[green]Saved[/green] {opts.outfile}")
     return opts.outfile
