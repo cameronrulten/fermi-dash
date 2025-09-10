@@ -196,7 +196,8 @@ def build_dashboard(opts: BuildOptions) -> Path:
     template = pn.template.FastListTemplate(
         title=opts.title,
         main=[header, tabs_obj],
-        theme=DarkTheme,
+        theme="dark",
+        theme_toggle=False,
     )
 
     # One-file export suitable for sharing
