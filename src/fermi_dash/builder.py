@@ -7,7 +7,7 @@ import yaml
 from rich import print as rprint
 from rich.console import Console
 import panel as pn
-from panel.io import save as pn_save
+from panel.io.save import save as pn_save
 
 pn.extension("plotly") # harmless if unused; keeps template resources present
 
