@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Static HTML dashboard for Fermi-LAT SED/lightcurve plots (Panel export)."
 authors = [ { name = "Your Name" } ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 dependencies = [
 "panel>=1.4",
 "pyyaml>=6.0",
