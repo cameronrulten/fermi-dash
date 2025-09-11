@@ -153,16 +153,19 @@ def _lc_pane(path: Path, prefer_html: bool) -> pn.viewable.Viewable:
 
 def make_template(name: str, title: str, header, tabs):
     if name.lower() == "material":
-        t = pn.template.MaterialTemplate(title=title, theme="dark")
+        t = pn.template.MaterialTemplate(title=title, theme=DarkTheme)
         t.main.extend([header, tabs])
         return t
     # default to fastlist + forced CSS
-    t = pn.template.FastListTemplate(title=title, main=[header, tabs], theme="dark", theme_toggle=False)
+    t = pn.template.FastListTemplate(title=title, main=[header, tabs], theme=DarkTheme, theme_toggle=False)
     t.config.raw_css = ["""...CSS from above..."""]
     return t
 
 def build_dashboard(opts: BuildOptions) -> Path:
     summaries = []
+
+    pn.extension(theme="dark")   # forces dark unless a template overrides it
+    
     names = load_target_names(opts.config_yaml)
     if not names:
         console.print("[bold red]No target names found in YAML.[/bold red]")
