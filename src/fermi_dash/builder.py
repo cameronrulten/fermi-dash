@@ -283,13 +283,13 @@ def build_dashboard(opts: BuildOptions) -> Path:
     :root {
     color-scheme: dark;
     /* Anthracite-ish palette */
-    --bg:        #0e1116;  /* page background */
-    --header-bg: #131720;  /* top app bar / tabs background */
-    --surface:   #161a22;  /* cards/panels */
-    --text:      #e6e9ee;  /* primary text (soft white) */
-    --muted:     #a0a9b6;  /* secondary text */
-    --border:    #232834;  /* subtle borders */
-    --accent:    #9ab4ff;  /* link/tab accent (tweak to taste) */
+    --bg:        #0f1115;  /* page background */
+    --header-bg: #141820;  /* top app bar / tabs background */
+    --surface:   #171a1e;  /* cards/panels */
+    --text:      #e2e6ea;  /* primary text (soft white) */
+    --muted:     #9fa7b3;  /* secondary text */
+    --border:    #232833;  /* subtle borders */
+    --accent:    #70e1c8;  /* link/tab accent (tweak to taste) */
     }
 
     html, body, .bk-root {
