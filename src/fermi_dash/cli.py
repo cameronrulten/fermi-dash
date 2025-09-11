@@ -19,6 +19,7 @@ days: Optional[List[str]] = typer.Option(None, help="Lightcurve bin sizes to inc
 # days: Optional[List[float]] = typer.Option(None, help="Lightcurve bin sizes to include, e.g. --days 7 30 365"),
 prefer_html: bool = typer.Option(False, help="Prefer embedding HTML lightcurves if available (Bokeh)"),
 allow_pdf: bool = typer.Option(False, help="Attempt to link/embed PDF SEDs if PNG not found"),
+template_name: str = typer.Option("material", help="material | fastlist")
 ):
     """Create a single-file HTML dashboard from a typical Fermi-LAT analysis folder.
 
@@ -69,6 +70,7 @@ allow_pdf: bool = typer.Option(False, help="Attempt to link/embed PDF SEDs if PN
         days=parsed_days,
         prefer_html=prefer_html,
         allow_pdf=allow_pdf,
+        template_name=template_name,
     )
 
     build_dashboard(opts)

@@ -150,6 +150,16 @@ def _lc_pane(path: Path, prefer_html: bool) -> pn.viewable.Viewable:
     
     return pn.pane.Markdown("*Lightcurve not available*")
 
+def make_template(name: str, title: str, header, tabs):
+    if name.lower() == "material":
+        t = pn.template.MaterialTemplate(title=title, theme="dark")
+        t.main.extend([header, tabs])
+        return t
+    # default to fastlist + forced CSS
+    t = pn.template.FastListTemplate(title=title, main=[header, tabs], theme="dark", theme_toggle=False)
+    t.config.raw_css = ["""...CSS from above..."""]
+    return t
+
 def build_dashboard(opts: BuildOptions) -> Path:
     summaries = []
     names = load_target_names(opts.config_yaml)
@@ -244,10 +254,12 @@ def build_dashboard(opts: BuildOptions) -> Path:
 
     tabs_obj = pn.Tabs(*tabs, dynamic=False)
 
-    template = pn.template.MaterialTemplate(
-        title=opts.title,
-        theme="dark",            # ← robust dark
-    )
+    template = make_template(opts.template_name, opts.title, header, tabs_obj)
+
+    # template = pn.template.MaterialTemplate(
+    #     title=opts.title,
+    #     theme="dark",            # ← robust dark
+    # )
     template.main.append(header)
     template.main.append(tabs_obj)
 
