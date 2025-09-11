@@ -171,7 +171,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
         # Fallback (covers some versions)
         from panel.theme import DarkTheme
 
-    pn.extension(theme="dark") #design="material",   # forces dark unless a template overrides it
+    pn.extension(design="material", theme="dark") # forces dark unless a template overrides it
 
     names = load_target_names(opts.config_yaml)
     if not names:
@@ -277,6 +277,60 @@ def build_dashboard(opts: BuildOptions) -> Path:
     # .mdc-top-app-bar, .pnx-header { background: #0b0d10 !important; color: #e7e9ea !important; }
     # .bk-card, .mdc-card, .pn-card { background:#1a1c20 !important; border-color:#1f2328 !important; }
     # """)
+
+    pn.config.raw_css.append("""
+    :root {
+    color-scheme: dark;
+    /* Anthracite-ish palette */
+    --bg:        #111317;  /* page background */
+    --header-bg: #141821;  /* top app bar / tabs background */
+    --surface:   #171a1f;  /* cards/panels */
+    --text:      #e4e7ec;  /* primary text (soft white) */
+    --muted:     #a6afbb;  /* secondary text */
+    --border:    #262c36;  /* subtle borders */
+    --accent:    #8ab4f8;  /* link/tab accent (tweak to taste) */
+    }
+
+    html, body, .bk-root {
+    background: var(--bg) !important;
+    color: var(--text) !important;
+    }
+
+    /* Top app bar / header */
+    .mdc-top-app-bar, .mdc-top-app-bar__row, .pnx-header {
+    background: var(--header-bg) !important;
+    color: var(--text) !important;
+    }
+
+    /* Cards / Panels */
+    .bk-card, .mdc-card, .pn-card {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    box-shadow: none !important;
+    }
+    .bk-card .bk-header, .mdc-card .bk-header {
+    background: transparent !important;
+    color: var(--text) !important;
+    }
+
+    /* Tabs */
+    .bk-tabs-header {
+    background: var(--header-bg) !important;
+    border-color: var(--border) !important;
+    }
+    .bk-tabs-header .bk-tab { color: var(--muted) !important; }
+    .bk-tabs-header .bk-active {
+    color: var(--text) !important;
+    border-color: var(--accent) !important;
+    }
+
+    /* Links */
+    a, .markdown a { color: var(--accent) !important; }
+
+    /* Minor chrome */
+    .bk-tooltip { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
+    """)
+
 
     # One-file export suitable for sharing
     #template.save(str(opts.outfile), embed=True)
