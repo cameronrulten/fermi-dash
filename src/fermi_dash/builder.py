@@ -283,8 +283,8 @@ def build_dashboard(opts: BuildOptions) -> Path:
     color-scheme: dark;
     /* Anthracite-ish palette */
     --bg:        #111317;  /* page background */
-    --header-bg: #141821;  /* top app bar / tabs background */
-    --surface:   #171a1f;  /* cards/panels */
+    --header-bg: #171a1f;  /* top app bar / tabs background */
+    --surface:   #141821;  /* cards/panels */
     --text:      #e4e7ec;  /* primary text (soft white) */
     --muted:     #a6afbb;  /* secondary text */
     --border:    #262c36;  /* subtle borders */
