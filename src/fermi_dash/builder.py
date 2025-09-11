@@ -279,8 +279,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
     # .bk-card, .mdc-card, .pn-card { background:#1a1c20 !important; border-color:#1f2328 !important; }
     # """)
 
-    # pn.config.raw_css.append(
-    template.config.raw_css.append("""
+    pn.config.raw_css.append("""
     :root{
     /* ChatGPT-ish palette */
     --bg:        #0E1116;  /* page */
