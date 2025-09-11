@@ -5,7 +5,7 @@ import sys
 
 IMG_EXTS  = {".png", ".jpg", ".jpeg", ".gif", ".svg"}
 HTML_EXTS = {".html"}
-RX = re.compile(r"_lightcurve_data_(\d+\.\d+)days(?=\.)", re.IGNORECASE)  # requires a decimal: 7.0, 180.25
+RX = re.compile(r"_lightcurve_(\d+\.\d+)days(?=\.)", re.IGNORECASE)  # requires a decimal: 7.0, 180.25
 
 def main(lc_dir: str):
     pdir = Path(lc_dir)
