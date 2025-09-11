@@ -260,7 +260,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
     header = pn.Column(
         f"## {opts.title}",
         pn.pane.Markdown(opts.subtitle, styles={"color": "#94a3b8"}),
-        pn.pane.Markdown(f"*Generated with fermi-dash*"),
+        pn.pane.Markdown(f"*Analysis by Cameron Rulten (Durham University and UMN) summary generated with fermi-dash*"),
         sizing_mode="stretch_width",
     )
 
