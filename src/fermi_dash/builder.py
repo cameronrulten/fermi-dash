@@ -271,7 +271,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
     console.print(f"[dim]Panel {pn.__version__} | Template={type(template).__name__} | theme param type={getattr(template, 'theme', None)}[/dim]")
 
     FORCE_DARK_CSS = """
-    :root { color-scheme: dark; }
+    :root { color-scheme: only dark; }
     html, body, .bk-root { background:#0b0d10 !important; color:#e7e9ea !important; }
     .mdc-top-app-bar, .mdc-top-app-bar__row, .mdc-top-app-bar__section { background:#0b0d10 !important; color:#e7e9ea !important; }
     .bk-card, .mdc-card, .pn-card { background:#1a1c20 !important; color:#e7e9ea !important; border-color:#1f2328 !important; }
