@@ -153,11 +153,11 @@ def _lc_pane(path: Path, prefer_html: bool) -> pn.viewable.Viewable:
 
 def make_template(name: str, title: str, header, tabs):
     if name.lower() == "material":
-        t = pn.template.MaterialTemplate(title=title, theme=DarkTheme)
+        t = pn.template.MaterialTemplate(title=title) #, theme=DarkTheme)
         t.main.extend([header, tabs])
         return t
     # default to fastlist + forced CSS
-    t = pn.template.FastListTemplate(title=title, main=[header, tabs], theme=DarkTheme, theme_toggle=False)
+    t = pn.template.FastListTemplate(title=title, main=[header, tabs], theme_toggle=False) #theme=DarkTheme
     t.config.raw_css = ["""...CSS from above..."""]
     return t
 
@@ -170,7 +170,8 @@ def build_dashboard(opts: BuildOptions) -> Path:
     except Exception:
         # Fallback (covers some versions)
         from panel.theme import DarkTheme
-    pn.extension(theme="dark")   # forces dark unless a template overrides it
+
+    pn.extension(design="material", theme="dark")   # forces dark unless a template overrides it
 
     names = load_target_names(opts.config_yaml)
     if not names:
@@ -271,7 +272,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
     console.print(f"[dim]Panel {pn.__version__} | Template={type(template).__name__} | theme param type={getattr(template, 'theme', None)}[/dim]")
 
     FORCE_DARK_CSS = """
-    :root { color-scheme: only dark; }
+    :root { color-scheme: dark; }
     html, body, .bk-root { background:#0b0d10 !important; color:#e7e9ea !important; }
     .mdc-top-app-bar, .mdc-top-app-bar__row, .mdc-top-app-bar__section { background:#0b0d10 !important; color:#e7e9ea !important; }
     .bk-card, .mdc-card, .pn-card { background:#1a1c20 !important; color:#e7e9ea !important; border-color:#1f2328 !important; }
@@ -280,6 +281,12 @@ def build_dashboard(opts: BuildOptions) -> Path:
     # Append as raw CSS so it is NOT escaped
     template.config.raw_css.append(FORCE_DARK_CSS)
 
+    pn.config.raw_css.append("""
+    :root { color-scheme: dark; }
+    html, body, .bk-root { background: #0b0d10 !important; color: #e7e9ea !important; }
+    .mdc-top-app-bar, .pnx-header { background: #0b0d10 !important; color: #e7e9ea !important; }
+    .bk-card, .mdc-card, .pn-card { background:#1a1c20 !important; border-color:#1f2328 !important; }
+    """)
 
     # One-file export suitable for sharing
     #template.save(str(opts.outfile), embed=True)
