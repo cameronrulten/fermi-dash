@@ -171,8 +171,8 @@ def build_dashboard(opts: BuildOptions) -> Path:
         # Fallback (covers some versions)
         from panel.theme import DarkTheme
 
-    pn.extension(design="native")
-    #pn.extension(design="material", theme="dark") # forces dark unless a template overrides it
+    # pn.extension(design="material")
+    pn.extension(design="native", theme="dark") # forces dark unless a template overrides it
 
     names = load_target_names(opts.config_yaml)
     if not names:
