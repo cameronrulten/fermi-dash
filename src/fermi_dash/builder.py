@@ -244,21 +244,28 @@ def build_dashboard(opts: BuildOptions) -> Path:
 
     tabs_obj = pn.Tabs(*tabs, dynamic=False)
 
-    template = pn.template.FastListTemplate(
+    template = pn.template.MaterialTemplate(
         title=opts.title,
-        main=[header, tabs_obj],
-        theme="dark",
-        theme_toggle=False,
+        theme="dark",            # ← robust dark
     )
+    template.main.append(header)
+    template.main.append(tabs_obj)
 
-    # 🔧 force dark colors as a safety net
-    template.config.raw_css = ["""
-    body, .bk, .bk-root { background: #0b0d10 !important; color: #e7e9ea !important; }
-    .pnx-header, .pnx-content { background: #0b0d10 !important; }
-    .bk-panel-models-card, .bk-card { background: #0f1216 !important; border-color: #1f2328 !important; }
-    .bk-tabs-header { background: #0b0d10 !important; border-color: #1f2328 !important; }
-    .bk-tabs-header .bk-active { color: #e7e9ea !important; }
-    """]
+    # template = pn.template.FastListTemplate(
+    #     title=opts.title,
+    #     main=[header, tabs_obj],
+    #     theme="dark",
+    #     theme_toggle=False,
+    # )
+
+    # # 🔧 force dark colors as a safety net
+    # template.config.raw_css = ["""
+    # body, .bk, .bk-root { background: #0b0d10 !important; color: #e7e9ea !important; }
+    # .pnx-header, .pnx-content { background: #0b0d10 !important; }
+    # .bk-panel-models-card, .bk-card { background: #0f1216 !important; border-color: #1f2328 !important; }
+    # .bk-tabs-header { background: #0b0d10 !important; border-color: #1f2328 !important; }
+    # .bk-tabs-header .bk-active { color: #e7e9ea !important; }
+    # """]
 
     # One-file export suitable for sharing
     #template.save(str(opts.outfile), embed=True)
