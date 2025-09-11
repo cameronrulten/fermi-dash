@@ -164,6 +164,12 @@ def make_template(name: str, title: str, header, tabs):
 def build_dashboard(opts: BuildOptions) -> Path:
     summaries = []
 
+    try:
+        # Panel 1.x commonly exposes it here
+        from panel.template import DarkTheme
+    except Exception:
+        # Fallback (covers some versions)
+        from panel.theme import DarkTheme
     pn.extension(theme="dark")   # forces dark unless a template overrides it
 
     names = load_target_names(opts.config_yaml)
@@ -264,13 +270,15 @@ def build_dashboard(opts: BuildOptions) -> Path:
 
     Console().print(f"[dim]Template theme → {type(template._theme).__name__}[/dim]")
 
-    force_dark_css = """
+    FORCE_DARK_CSS = """
     :root { color-scheme: dark; }
-    html, body, .bk-root { background: #0b0d10 !important; color: #e7e9ea !important; }
-    .bk-card { background: #0f1216 !important; border-color: #1f2328 !important; }
-    .mdc-top-app-bar, .pnx-header { background: #0b0d10 !important; color: #e7e9ea !important; }
+    html, body, .bk-root { background:#0b0d10 !important; color:#e7e9ea !important; }
+    .mdc-top-app-bar, .mdc-top-app-bar__row, .mdc-top-app-bar__section { background:#0b0d10 !important; color:#e7e9ea !important; }
+    .bk-card, .mdc-card, .pn-card { background:#1a1c20 !important; color:#e7e9ea !important; border-color:#1f2328 !important; }
+    .bk-tabs-header { background:#0b0d10 !important; border-color:#1f2328 !important; }
     """
-    template.modal.append(pn.pane.HTML(f"<style>{force_dark_css}</style>"))
+    # Append as raw CSS so it is NOT escaped
+    template.config.raw_css.append(FORCE_DARK_CSS)
 
 
     # One-file export suitable for sharing
