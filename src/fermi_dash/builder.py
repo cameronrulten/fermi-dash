@@ -36,6 +36,7 @@ class BuildOptions:
     days: Optional[List[float]] = None # e.g., [7.0, 30.0]
     prefer_html: bool = False # use HTML lightcurves if available
     allow_pdf: bool = False # try to embed PDF SEDs (off by default)
+    template_name: str = "material"  # "material" | "fastlist"
 
 # ------------------ YAML parsing ------------------
 
