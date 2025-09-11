@@ -267,8 +267,8 @@ def build_dashboard(opts: BuildOptions) -> Path:
     tabs_obj = pn.Tabs(*tabs, dynamic=False)
 
     template = make_template(opts.template_name, opts.title, header, tabs_obj)
-    template.main.append(header)
-    template.main.append(tabs_obj)
+    # template.main.append(header)
+    # template.main.append(tabs_obj)
 
     console.print(f"[dim]Panel {pn.__version__} | Template={type(template).__name__} | theme param type={getattr(template, 'theme', None)}[/dim]")
 
