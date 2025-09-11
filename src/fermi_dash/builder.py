@@ -268,7 +268,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
     template.main.append(header)
     template.main.append(tabs_obj)
 
-    console.print(f"[dim]Template theme → {type(template.theme).__name__}[/dim]")
+    console.print(f"[dim]Panel {pn.__version__} | Template={type(template).__name__} | theme param type={getattr(template, 'theme', None)}[/dim]")
 
     FORCE_DARK_CSS = """
     :root { color-scheme: dark; }
