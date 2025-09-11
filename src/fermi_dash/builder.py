@@ -282,7 +282,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
     :root {
     color-scheme: dark;
     /* Anthracite-ish palette */
-    --bg:        #111317;  /* page background */
+    --bg:        #141821;  /* page background */
     --header-bg: #171a1f;  /* top app bar / tabs background */
     --surface:   #141821;  /* cards/panels */
     --text:      #e4e7ec;  /* primary text (soft white) */
