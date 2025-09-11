@@ -272,6 +272,27 @@ def build_dashboard(opts: BuildOptions) -> Path:
 
     console.print(f"[dim]Panel {pn.__version__} | Template={type(template).__name__} | theme param type={getattr(template, 'theme', None)}[/dim]")
 
+    pn.config.raw_css.append("""
+    :root{
+    # /* ChatGPT-ish palette */
+    # --bg:        #0E1116;  /* page */
+    # --header-bg: #11161D;  /* top app bar / tab strip */
+    # --surface:   #141922;  /* cards/panes */
+    # --surface-2: #171E28;  /* deeper surfaces if needed */
+    # --text:      #E6E9EE;  /* primary text */
+    # --muted:     #A6AFBB;  /* secondary text */
+    # --border:    #242B33;  /* subtle borders */
+    # --accent:    #10A37F;  /* OpenAI/ChatGPT green */
+    # --accent-2:  #2DC08D;  /* hover/active variant */
+    # --focus:     #3AD2A1;  /* focus ring */
+    # }
+
+    # /* Base */
+    # html, body, .bk-root{ background:var(--bg) !important; color:var(--text) !important; }
+    # a, .markdown a{ color:var(--accent) !important; text-decoration:none; }
+    # a:hover{ color:var(--accent-2) !important; }"""
+    )
+
     # pn.config.raw_css.append("""
     # :root { color-scheme: dark; }
     # html, body, .bk-root { background: #0b0d10 !important; color: #e7e9ea !important; }
