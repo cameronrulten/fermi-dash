@@ -17,12 +17,12 @@ IMG_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".svg"}
 HTML_EXTS = {".html"}
 PDF_EXTS = {".pdf"}
 
-# Require a decimal: \d+\.\d+
-# Matches: ..._lightcurve_data_7.0days.png, ..._lightcurve_data_180.25days.html
-LC_FLOAT_RE = re.compile(
-    r"_lightcurve_data_(?P<days>\d+\.\d+)days(?=\.)",
-    re.IGNORECASE
-)
+# Require a decimal (e.g. 7.0, 180.25). Case-insensitive.
+# Support BOTH “…_lightcurve_<days>days” and “…_lightcurve_data_<days>days”
+LC_PATTERNS = [
+    re.compile(r"_lightcurve_(?P<days>\d+\.\d+)days(?=\.)", re.IGNORECASE),
+    re.compile(r"_lightcurve_data_(?P<days>\d+\.\d+)days(?=\.)", re.IGNORECASE),
+]
 
 console = Console()
 
@@ -88,7 +88,7 @@ def find_sed_path(target_dir: Path, allow_pdf: bool) -> Optional[Path]:
 def discover_lightcurves(lc_dir: Path) -> Dict[float, Dict[str, Path]]:
     """
     Returns {days: {'.png': Path, '.html': Path, ...}} for visual files only.
-    Days must include a decimal (e.g. 7.0, 180.25).
+    Days must include a decimal (e.g. 7.0, 180.25). Case-insensitive.
     """
     out: Dict[float, Dict[str, Path]] = {}
     if not lc_dir.exists():
@@ -98,17 +98,22 @@ def discover_lightcurves(lc_dir: Path) -> Dict[float, Dict[str, Path]]:
         if not p.is_file():
             continue
         ext = p.suffix.lower()
-        if ext not in (IMG_EXTS | HTML_EXTS):
+        if ext not in (IMG_EXTS | HTML_EXTS):  # 🔒 ignore .txt/.json/etc.
             continue
 
-        m = LC_FLOAT_RE.search(p.name)
-        if not m:
+        days_val = None
+        for rx in LC_PATTERNS:
+            m = rx.search(p.name)
+            if m:
+                days_val = float(m.group("days"))
+                break
+        if days_val is None:
             continue
 
-        days = float(m.group("days"))
-        out.setdefault(days, {})[ext] = p
+        out.setdefault(days_val, {})[ext] = p
 
     return out
+
 
 # ------------------ Panel UI builders ------------------
 
