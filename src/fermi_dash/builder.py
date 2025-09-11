@@ -279,62 +279,62 @@ def build_dashboard(opts: BuildOptions) -> Path:
     # .bk-card, .mdc-card, .pn-card { background:#1a1c20 !important; border-color:#1f2328 !important; }
     # """)
 
-    pn.config.raw_css.append("""
-    :root{
-    /* ChatGPT-ish palette */
-    --bg:        #ffffff;  /* page */
-    --header-bg: #11161D;  /* top app bar / tab strip */
-    --surface:   #141922;  /* cards/panes */
-    --surface-2: #171E28;  /* deeper surfaces if needed */
-    --text:      #E6E9EE;  /* primary text */
-    --muted:     #A6AFBB;  /* secondary text */
-    --border:    #242B33;  /* subtle borders */
-    --accent:    #10A37F;  /* OpenAI/ChatGPT green */
-    --accent-2:  #2DC08D;  /* hover/active variant */
-    --focus:     #3AD2A1;  /* focus ring */
-    }
+    # pn.config.raw_css.append("""
+    # :root{
+    # /* ChatGPT-ish palette */
+    # --bg:        #ffffff;  /* page */
+    # --header-bg: #11161D;  /* top app bar / tab strip */
+    # --surface:   #141922;  /* cards/panes */
+    # --surface-2: #171E28;  /* deeper surfaces if needed */
+    # --text:      #E6E9EE;  /* primary text */
+    # --muted:     #A6AFBB;  /* secondary text */
+    # --border:    #242B33;  /* subtle borders */
+    # --accent:    #10A37F;  /* OpenAI/ChatGPT green */
+    # --accent-2:  #2DC08D;  /* hover/active variant */
+    # --focus:     #3AD2A1;  /* focus ring */
+    # }
 
-    /* Base */
-    html, body, .bk-root{ background:var(--bg) !important; color:var(--text) !important; }
-    a, .markdown a{ color:var(--accent) !important; text-decoration:none; }
-    a:hover{ color:var(--accent-2) !important; }
+    # /* Base */
+    # html, body, .bk-root{ background:var(--bg) !important; color:var(--text) !important; }
+    # a, .markdown a{ color:var(--accent) !important; text-decoration:none; }
+    # a:hover{ color:var(--accent-2) !important; }
 
-    /* Header / app bar */
-    .mdc-top-app-bar, .mdc-top-app-bar__row, .pnx-header{
-    background:var(--header-bg) !important; color:var(--text) !important;
-    }
+    # /* Header / app bar */
+    # .mdc-top-app-bar, .mdc-top-app-bar__row, .pnx-header{
+    # background:var(--header-bg) !important; color:var(--text) !important;
+    # }
 
-    /* Cards / panels */
-    .bk-card, .mdc-card, .pn-card{
-    background:var(--surface) !important; color:var(--text) !important;
-    border-color:var(--border) !important; box-shadow:none !important;
-    }
-    .bk-card .bk-header, .pn-card .bk-header{ background:transparent !important; color:var(--muted) !important; }
+    # /* Cards / panels */
+    # .bk-card, .mdc-card, .pn-card{
+    # background:var(--surface) !important; color:var(--text) !important;
+    # border-color:var(--border) !important; box-shadow:none !important;
+    # }
+    # .bk-card .bk-header, .pn-card .bk-header{ background:transparent !important; color:var(--muted) !important; }
 
-    /* Bokeh Tabs (Panel Tabs) */
-    .bk-tabs-header{ background:var(--header-bg) !important; border-color:var(--border) !important; }
-    .bk-tabs-header .bk-tab{ color:var(--muted) !important; }
-    .bk-tabs-header .bk-tab.bk-active{ color:var(--accent) !important; border-color:var(--accent) !important; }
+    # /* Bokeh Tabs (Panel Tabs) */
+    # .bk-tabs-header{ background:var(--header-bg) !important; border-color:var(--border) !important; }
+    # .bk-tabs-header .bk-tab{ color:var(--muted) !important; }
+    # .bk-tabs-header .bk-tab.bk-active{ color:var(--accent) !important; border-color:var(--accent) !important; }
 
-    /* Material Tabs (if template renders MDC tabs anywhere) */
-    .mdc-tab{ color:var(--muted) !important; }
-    .mdc-tab.mdc-tab--active{ color:var(--accent) !important; }
-    .mdc-tab-indicator .mdc-tab-indicator__content{
-    background-color:var(--accent) !important; border-color:var(--accent) !important;
-    }
+    # /* Material Tabs (if template renders MDC tabs anywhere) */
+    # .mdc-tab{ color:var(--muted) !important; }
+    # .mdc-tab.mdc-tab--active{ color:var(--accent) !important; }
+    # .mdc-tab-indicator .mdc-tab-indicator__content{
+    # background-color:var(--accent) !important; border-color:var(--accent) !important;
+    # }
 
-    /* Tooltips, menus, small chrome */
-    .bk-tooltip, .bk-menu, .mdc-menu{ background:var(--surface-2) !important; color:var(--text) !important; border-color:var(--border) !important; }
+    # /* Tooltips, menus, small chrome */
+    # .bk-tooltip, .bk-menu, .mdc-menu{ background:var(--surface-2) !important; color:var(--text) !important; border-color:var(--border) !important; }
 
-    /* Inputs / focus */
-    input, select, textarea{ background:var(--surface) !important; color:var(--text) !important; border-color:var(--border) !important; }
-    *:focus{ outline: 2px solid var(--focus) !important; outline-offset:2px; }
+    # /* Inputs / focus */
+    # input, select, textarea{ background:var(--surface) !important; color:var(--text) !important; border-color:var(--border) !important; }
+    # *:focus{ outline: 2px solid var(--focus) !important; outline-offset:2px; }
 
-    /* (Optional) softer scrollbars on Firefox/WebKit */
-    *{ scrollbar-color: var(--surface-2) transparent; }
-    ::-webkit-scrollbar{ height:10px; width:10px; }
-    ::-webkit-scrollbar-thumb{ background:var(--surface-2); border-radius:8px; }
-    """)
+    # /* (Optional) softer scrollbars on Firefox/WebKit */
+    # *{ scrollbar-color: var(--surface-2) transparent; }
+    # ::-webkit-scrollbar{ height:10px; width:10px; }
+    # ::-webkit-scrollbar-thumb{ background:var(--surface-2); border-radius:8px; }
+    # """)
 
 
     # One-file export suitable for sharing
