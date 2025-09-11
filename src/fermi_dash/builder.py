@@ -242,7 +242,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
         sizing_mode="stretch_width",
     )
 
-    tabs_obj = pn.Tabs(*tabs, dynamic=False)
+    tabs_obj = pn.Tabs(*tabs, dynamic=True)
 
     template = pn.template.FastListTemplate(
         title=opts.title,
