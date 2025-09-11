@@ -282,7 +282,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
     pn.config.raw_css.append("""
     :root{
     /* ChatGPT-ish palette */
-    --bg:        #0E1116;  /* page */
+    --bg:        #ffffff;  /* page */
     --header-bg: #11161D;  /* top app bar / tab strip */
     --surface:   #141922;  /* cards/panes */
     --surface-2: #171E28;  /* deeper surfaces if needed */
