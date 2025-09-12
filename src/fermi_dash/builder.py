@@ -281,7 +281,7 @@ def build_dashboard(opts: BuildOptions) -> Path:
         f"## {opts.title}",
         pn.pane.Markdown(opts.subtitle, styles={"color": "#94a3b8"}),
         pn.pane.Markdown(
-            f"*Analysis by Cameron Rulten (Durham University and UMN). Summary generated with fermi-dash*"
+            f"*Analysis by Cameron Rulten (Durham University & University of Minnesota). Summary generated with fermi-dash*"
         ),
         sizing_mode="stretch_width",
     )
